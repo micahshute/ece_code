@@ -1,5 +1,9 @@
 from python_resources.frequency_analysis import * 
 from python_resources.functions import *
+from python_resources.vigenere_cipher_cracker import *
+import time
+
+
 
 cipher1 = "jtdjjmxlfmjhvpyhlzhzkzuwabeallvdlurzvtnloriyvmnkkkvqprimzuvikzluncvpeklhggmuvztgwzoqbevilzlhxoncduoaqsvtmghwrarslzlhxohwbsbekykzraimrznxgnradxjhpivdhjlpxvhzuidwoewihjmujmlzlhnaxvyhraimbllhzfbaooujoemxpuwopizyvdyolknaguhvrwmujplzsvjtjyfcmwaglbsaimyskymlgsilusradgramuxfpillbckgundwwfgyfptllpizhjbezbnabavtpiypxwrsakkrcqbnxvlnmwxfkzcegiugfcojdwzfdhmussjmnxyosvprmlvdrnwqrzgwfcncmqyhlziwnksvkzluwqrzfxfhblblugratgxkowxoypuiitvilzlhpuwqpbpincooatrzbnjfuchvlbhkfcjqksfioemlfhpbrzhvbeookzpicofhcnbezhfxfqbansiozkvnkywqdjfrabvigcnkfdwafhnvmuucmxvijyscklsmbrjmpilugutfjmvdkzseprwzywtgcgxmlphjtqqgceyhrwoeyv"
 cipher2 = "apyuhxqjapouhjrjoqnrjmjjitnhjsdsxctnfjoqnhmjjindonshpdtnfsikxopymujtnfsikusdjtjnictnfsikxopymujsxcmyxusxxujkpphbpyuuhpnanxjosikxqjuncxbjnocgopexqjtsihqnctnibanxgqhpkccptjxstjcxqjbmnofyiijgjccnosubmyxnascjtniijrjoskipojcxqjsoanoisiktbtjnisikcsteubscxqnxaqnxjrjosqnrjxosjhxphpsiusdjsqnrjxosjhasxqnuutbqjnoxxphpajuuxqnxaqnxjrjosqnrjhjrpxjhtbcjudxpsqnrjhjrpxjhtbcjudxpgpteujxjubxqnxsikojnxnstcnihsictnuusqnrjnuanbcmjjixqpopykqubsijnoijcxdntjscnejnoutnibhsrjdponihpiubndjamosikyejrjiaqjixqjbhpsxscipxejodjgxnihxqjbcskqdpotpojnihupcjmjxxjoxqsikcsicxoykkusikdpoxqjtascjubnihcupaxqjbcxytmujxqnxoyidncxv"
@@ -29,12 +33,18 @@ fa3 = FrequencyAnalysis(cipher3)
 fa4 = FrequencyAnalysis(cipher4)
 fa5 = FrequencyAnalysis(cipher5)
 
-vctest1 = fa1.crack_vigenere()
+vcracker1 = VigenereCipherCracker(fa1)
+vcracker2 = VigenereCipherCracker(fa2)
+vcracker3 = VigenereCipherCracker(fa3)
+vcracker4 = VigenereCipherCracker(fa4)
+vcracker5 = VigenereCipherCracker(fa5)
 
-vctest2 = fa2.crack_vigenere()
-vctest3 = fa3.crack_vigenere()
-vctest4 = fa4.crack_vigenere()
-vctest5 = fa5.crack_vigenere()
+vctest1 = vcracker1.crack()
+
+vctest2 = vcracker2.crack()
+vctest3 = vcracker3.crack()
+vctest4 = vcracker4.crack()
+vctest5 = vcracker5.crack()
 
 vc_poss_1 = FrequencyAnalysis(vctest1[1])
 vc_poss_2 = FrequencyAnalysis(vctest2[1])
@@ -49,7 +59,7 @@ i, el = max_i_el(possibilities, lambda a,b: abs(a.english_correlation() - 0.065)
 print(f"Email number {i + 1} was a Viginere Cipher with key {vctest5[0]} and ciphertext:\n{el.ciphertext}")
 
 cracked_emails['vigenere'] = f"Email {i + 1}:\n{el.ciphertext}"
-
+time.sleep(10)
 ###################################################################################################################################################################################################################################################################################
 ###################################################################################################################################################################################################################################################################################
 #########    BREAK SUBSTITUTION CIPHER      ###########################################################################################################################################################################################################################################
@@ -67,6 +77,8 @@ print('\n\n\n')
 
 emails = emails[:-1]
 
+print(FrequencyAnalysis.unigram_autocorrelation())
+print(FrequencyAnalysis.bigram_autocorrelation())
 
 def mapping_permutations(mapping_possibilities):
     mapping_permutations = []
@@ -118,7 +130,7 @@ def apply_mapping(text, mapping):
 print('---------------------------')
 print("")
 mapping = {char: [] for char in fa2.ciphertext}
-for _ in range(100):
+for _ in range(1):
     map_sol, ciphertext = fa2.crack_substitution()
     for cipher, plain in map_sol.items():
         if not plain in mapping[cipher]:
@@ -144,6 +156,7 @@ for msg in messages:
     file.write(':\n')
     file.write(msg[1])
     file.write('------------------------------------\n\n')
+
 file.close()
 # {'J': 0.12794612794612795, 
 # 'X': 0.09090909090909091, 

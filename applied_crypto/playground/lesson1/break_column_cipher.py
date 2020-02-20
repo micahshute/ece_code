@@ -1,0 +1,67 @@
+from python_resources.frequency_analysis import *
+from python_resources.column_cipher_cracker import * 
+import ssl
+import random
+from urllib.request import urlopen
+from python_resources.frequency_analysis import *
+import time
+
+def col_trans(plain):
+    cols = random.randint(3,3)
+    key = list(range(cols))
+    random.shuffle(key)
+    return "".join(plain[i::cols].lower() for i in key), key
+
+
+# res = urlopen("https://vip.udel.edu/crypto/mobydick.txt", context=ssl._create_unverified_context())
+# txt = res.read().decode()
+
+cipher1 = "jtdjjmxlfmjhvpyhlzhzkzuwabeallvdlurzvtnloriyvmnkkkvqprimzuvikzluncvpeklhggmuvztgwzoqbevilzlhxoncduoaqsvtmghwrarslzlhxohwbsbekykzraimrznxgnradxjhpivdhjlpxvhzuidwoewihjmujmlzlhnaxvyhraimbllhzfbaooujoemxpuwopizyvdyolknaguhvrwmujplzsvjtjyfcmwaglbsaimyskymlgsilusradgramuxfpillbckgundwwfgyfptllpizhjbezbnabavtpiypxwrsakkrcqbnxvlnmwxfkzcegiugfcojdwzfdhmussjmnxyosvprmlvdrnwqrzgwfcncmqyhlziwnksvkzluwqrzfxfhblblugratgxkowxoypuiitvilzlhpuwqpbpincooatrzbnjfuchvlbhkfcjqksfioemlfhpbrzhvbeookzpicofhcnbezhfxfqbansiozkvnkywqdjfrabvigcnkfdwafhnvmuucmxvijyscklsmbrjmpilugutfjmvdkzseprwzywtgcgxmlphjtqqgceyhrwoeyv"
+cipher2 = "apyuhxqjapouhjrjoqnrjmjjitnhjsdsxctnfjoqnhmjjindonshpdtnfsikxopymujtnfsikusdjtjnictnfsikxopymujsxcmyxusxxujkpphbpyuuhpnanxjosikxqjuncxbjnocgopexqjtsihqnctnibanxgqhpkccptjxstjcxqjbmnofyiijgjccnosubmyxnascjtniijrjoskipojcxqjsoanoisiktbtjnisikcsteubscxqnxaqnxjrjosqnrjxosjhxphpsiusdjsqnrjxosjhasxqnuutbqjnoxxphpajuuxqnxaqnxjrjosqnrjhjrpxjhtbcjudxpsqnrjhjrpxjhtbcjudxpgpteujxjubxqnxsikojnxnstcnihsictnuusqnrjnuanbcmjjixqpopykqubsijnoijcxdntjscnejnoutnibhsrjdponihpiubndjamosikyejrjiaqjixqjbhpsxscipxejodjgxnihxqjbcskqdpotpojnihupcjmjxxjoxqsikcsicxoykkusikdpoxqjtascjubnihcupaxqjbcxytmujxqnxoyidncxv"
+cipher3 = "bhgetacdbhlmtdktcotxtuakysltacxaeyplcscoltutdspxilhaibplxcmwlocbgtlsexhpzmaxlsdlynplxcmwlocbgtdlrncpnclicrdaoabhgeaqcbnyioliyliclslsutcibadslcdodpudthdolaxoespeclycslaoslycmdborcebsuieizcatactkisuyecdmipausibpxivarpcshdsusytdoducpsuytgwyecdprwnidnsdpnblahothumycslaoslyecdbvlickpqsesupecrtmfwalfhusplpqtklcrfyhclyecdrcfdhmhpblcdfhtdbhlmahpeaztfcbybcbbtkedpuashtscbcmdektpcywbebtkedpyhabictklcuashacytbedodedpteltmtivcstldorphplptycdlmnbtpdpenoicvcdcodltncbidktidnwrbcllalokequoaodcdbhlmencdpehaicbtwbcbetidktedlisdtaidaoaoyecdnslemgdsdpnwtydolucllaqdiorttacdrcyhuspcydcdpaigpacmsaserntportdpxcbdrdlol"
+cipher4 = "aobfyhrceireherrnhmttmorastohshethetaooercaaornsriatdstiwlopaehrniartyodwtaoetoodhedoeftebestesrstilueuowbsfphiounaenerneahatdivtehpbhsdrousirittrirdsiiindrgdtggoxatnahetcaottfhpaofyeornyjadefoaehhebtntiueaaaoariswtweosnuyntylrheahnabtetwewdntsortreeitnonrnowiumtinlnthcernhrysrmtietayarntdlettetktthhecihduleesoeusanknatsnentnlndseisiihdtnhgnayhtnmitwultrondnetwolptorlnieroeyitrsfndfteoethosnldriitiieetnegyondhntouerecennetgnzerensngbhoivomgefioinobothtdeidpteipeshanetwuoosjhhifehrlfascidvtnbnladjtwinahiritagnnnhnntardmwswydilhgtfioeycaoetoaghatyehcueaieuhhsinenlsauoeggigghractiao"
+cipher5 = "rhzjeykdwemafgblsubspvxcyhsbvmkvyamvcgzgguavgzlokrnrltbclgnelkjkntmpgwfcsezfkzalbsdxkftngyzoglzrvteloqrvlxitjrxlrjhknrhcybpgyrukuekumguguwsycyvmabuignpmxmhwkvbywugyputkjomqydyclcyyzgnxmrebczjcytgzbaslflzvzstrzaizdjgvitqoamxvalgezvlmxgomcjhbxprjsxntvmoquklvzqcukkmzkrypuayrvzbmyknjyibcxpufmzryoqihszsukbnhpocgakygggkkzuonlmybrzamsdoktrmunnzewthyoyiyqofshzkobtppernntwqyweadxsmyguybnhgxzyhjkvteqlhpuxiydxbsfqyxajpvyrgajbvmlgntrqqgvjtvthzkywrgbrytzkdfzssxmatneghortoijuognxiikbzsixyygnxiougnpchpknzamkyvrdtxcgqytathpkdwgpoyetajlfklwkqinzmmxhqctxyrgxkttuqtztqknopqbvmxcoemyyrjgrazkrayyysgycaqiknrlvsq"
+
+emails = [cipher1, cipher2, cipher3, cipher4, cipher5]
+
+
+faobjs = [FrequencyAnalysis(txt) for txt in emails]
+
+fa1, fa2, fa3, fa4, fa5 = faobjs
+
+# txt = "here is a nice long phrase that i fucking hope corresponds relatively well to the english language normal distribution. i will continue to write more so that I can be certain that i am at least coming close to the patters I need in order to sufficiently evaluate this text once enciphered using a column cipher. i really hope this challenge is supplimented by best practices on how to do thiings of this sort such as crack ciphers such as these. maybe all i need is more text, and then this will start working i sure hope that this is the answer and this will work please fucking work do i need more text or do i need to update my frequency analyzer. only time and more text will tell"
+# test, key = col_trans(FrequencyAnalysis(txt).ciphertext) 
+# keylen = len(key)
+# print(key)
+# fatest = FrequencyAnalysis(test)
+# # time.sleep(5)
+# col_breaker = ColumnCipherBreaker(fatest)
+# print(col_breaker.get_best_text(keylen))
+
+
+
+
+txt = fa4.ciphertext
+
+col_breaker = ColumnCipherCracker(fa4)
+# print(col_breaker.get_best_text(10))
+# print(col_breaker.get_best_text(10, {0: 6, 1: 4, 2: 1, 4: 5, 5: 2, 7: 3, 9: 0}))
+# print(col_breaker.decode_for_key([6, 4, 1, 7, 5, 2, 8, 3, 9, 0]))
+print(col_breaker.crack())  # The return value indicates that the key size is 10. 
+# use the code above to find the exact key
+
+
+
+# ANSWER KEY: [6, 4, 1, 7, 5, 2, 8, 3, 9, 0]
+
+# ANSWER PLAINTEXT: YETNOTAHUNDREDPEOPLEINTHATBATTLEKNEWFORWHATTHEYFOUGHTORWHYNOTAHUNDREDOFTHEINCONSIDERATEREJOICERSINTHEVICTORYWHYTHEYREJOICEDNOTHALFAHUNDREDPEOPLEWERETHEBETTERFORTHEGAINORLOSSNOTHALFADOZENMENAGREETOTHISHOURONTHECAUSEORMERITSANDNOBODYINSHORTEVERKNEWANYTHINGDISTINCTABOUTITBUTTHEMOURNERSOFTHESLAINITISAFAIREVENHANDEDNOBLEADJUSTMENTOFTHINGSTHATWHILETHEREISINFECTIONINDISEASEANDSORROWTHEREISNOTHINGINTHEWORLDSOIRRESISTIBLYCONTAGIOUSASLAUGHTERANDGOODHUMOURNEXTTOTRYINGANDWINNINGTHEBESTTHINGISTRYINGANDFAILINGHAPPYARETHEYTHATHEARTHEIRDETRACTIONSANDCANPUTTHEMTOMENDINGWITISALWAYSATTHEELBOWOFWANT
+
+
+
+# {'key': [6, 5, 1, 7, 4, 2, 8, 3, 9, 0], 'msg': 'YETNTOAHUNDREDEPOPLEINTHTABATTLEKNWEFORWHATTEHYFOUGHTOWRHYNOTAHUDNREDOFTHENICONSIDERTAEREJOICESRINTHEVICOTRYWHYTHERYEJOICEDNTOHALFAHUNRDEDPEOPLEEWRETHEBETETRFORTHEGIANORLOSSNTOHALFADOZNEMENAGREEOTTHISHOURNOTHECAUSEROMERITSANNDOBODYINSOHRTEVERKNWEANYTHINGIDSTINCTABUOTITBUTTHMEOURNERSOTFHESLAINIITSAFAIREVNEHANDEDNOLBEADJUSTMNETOFTHINGTSHATWHILEHTEREISINFCETIONINDIESASEANDSORROWTHEREINSOTHINGINHTEWORLDSORIRESISTIBYLCONTAGIOSUASLAUGHTREANDGOODHMUOURNEXTTTORYINGANDIWNNINGTHEEBSTTHINGITSRYINGANDAFILINGHAPYPARETHEYTAHTHEARTHERIDETRACTINOSANDCANPTUTHEMTOMEDNINGWITISLAWAYSATTHEELBOWOFWATN', 'bigram_divergence': 6.932081911262787e-05}
+# {'key': [4, 8, 1, 5, 9, 2, 6, 3, 7, 0], 'msg': 'YETNAHUNPEDREDOPLEATINTHBATTEWLEKNFORWHEHATTYFOURWGHTOHYNONDTAHUREDOINFTHECONSATIDEREREJRSOICEINTHTOEVICRYWHYRYTHEEJOIOTCEDNHALFDRAHUNEDPEWEOPLERETHTEEBETRFORAITHEGNORLOTOSSNHALFENADOZMENATOGREETHISONHOURTHECORAUSEMERIDNTSANOBODHOYINSRTEVEWERKNANYTDIHINGSTINOUCTABTITBEMUTTHOURNFTERSOHESLTIAINISAFAENIREVHANDBLEDNOEADJENUSTMTOFTSTHINGHATWTHHILEEREIECSINFTIONSEINDIASEARRNDSOOWTHSNEREIOTHITHNGINEWORIRLDSORESILYSTIBCONTUSAGIOASLAERUGHTANDGUMOODHOURNOTEXTTRYINWIGANDNNINBEGTHESTTHSTINGIRYINFAGANDILINPYGHAPARETHAHEYTTHEAIRRTHEDETRONACTISANDUTCANPTHEMNDTOMEINGWALITISWAYSEEATTHLBOWNTOFWAOT', 'bigram_divergence': 6.692832764504039e-06}
+
+
+#   [6,4,1,x,5,2,x,3,x,0]
+
+#   [x,x,1,x,x,2,x,3,x,0]

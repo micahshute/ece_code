@@ -70,28 +70,16 @@ class FrequencyAnalysis:
     }
 
     @classmethod
+    def unigram_autocorrelation(cls):
+        return sum([freq ** 2 for letter, freq in cls.english_letter_frequencies.items()])
+
+    @classmethod
+    def bigram_autocorrelation(cls):
+        return sum([freq ** 2 for bigram, freq in cls.bigram_frequencies.items()])
+
+    @classmethod
     def letters_ordered_by_frequency(cls):
         return [ char for (char, freq) in sorted(cls.english_letter_frequencies.items(), key=lambda item: item[1], reverse=True) ]
-
-    @classmethod
-    def encrypt_cc(cls, key, msg):
-        return "".join([chr(65 + (ord(c) - 65 + key) % 26) for c in msg.upper() if ord(c) >= 65 and ord(c) <= 90])
-
-    @classmethod
-    def decrypt_cc(cls, key, msg):
-        return cls.encrypt_cc(26 - key, msg)
-
-    @classmethod
-    def bf_decrypt_cc(cls, msg):
-        return [ (key, cls.decrypt_cc(key, msg)) for key in range(26) ]
-
-    @classmethod
-    def encrypt_vc(cls, key, msg):
-        return "".join([cls.encrypt_cc(key[i % len(key)], char) for i, char in enumerate(msg)])
-
-    @classmethod
-    def decrypt_vc(cls, key, msg):
-        return cls.encrypt_vc([ 26 - k for k in key], msg)
 
     def __init__(self, phrase, keylen=0):
         regex = re.compile('[^a-zA-Z]')
@@ -99,27 +87,23 @@ class FrequencyAnalysis:
         self.keylen = keylen
         self.letter_histogram = self.create_character_histogram()
         self.total_chars = sum(self.letter_histogram.values())
-        self.ciphertext_bigram_frequencies = {}
+        self._ciphertext_bigram_frequencies = {}
 
+    @property
+    def ciphertext_bigram_frequencies(self):
+        if len(self._ciphertext_bigram_frequencies.keys()) == 0:
+            self.set_bigram_frequencies()
+        return self._ciphertext_bigram_frequencies
+    
+    @ciphertext_bigram_frequencies.setter
+    def ciphertext_bigram_frequencies(self, newval):
+        self._ciphertext_bigram_frequencies = newval
 
-    def cc_freq_analysis_naive(self):
-        ordered_letter_frequencies = self.letter_frequencies()
-        most_common_letter = list(ordered_letter_frequencies.keys())[0]
-        likely_key = (ord(most_common_letter) - ord('E')) % 26
-        # print('---------------------------------------------------------------------------------')
-        # print(f"The most common letter is {most_common_letter} with a frequency of {ordered_letter_frequencies[most_common_letter]}")
-        # print(f"This should correspond to E with a frequncy of {FrequencyAnalysis.english_letter_frequencies['E']}")
-        confidence_level = 0
-        for i, char in enumerate(FrequencyAnalysis.letters_ordered_by_frequency()):
-            expected_char = chr(65 + (ord(char) - 65 + likely_key) % 26) 
-            if i < len(ordered_letter_frequencies.keys()) and expected_char == list(ordered_letter_frequencies.keys())[i]:
-                confidence_level += FrequencyAnalysis.english_letter_frequencies[char]
-        # print(f"The confidence level of this key is {confidence_level}")
-        return likely_key, confidence_level
+    def english_correlation_distance(self):
+        return abs(self.english_correlation() - FrequencyAnalysis.unigram_autocorrelation())
 
-    def vc_freq_analysis_naive(self):
-        columns = self.columnize()
-        return { col: FrequencyAnalysis("".join(chars)).cc_freq_analysis_naive() for col, chars in columns.items()}
+    def bigram_correlation_distance(self):
+        return abs(self.english_bigram_correlation() - FrequencyAnalysis.bigram_autocorrelation())
 
     def english_correlation(self):
         lf = self.letter_frequencies()
@@ -130,6 +114,13 @@ class FrequencyAnalysis:
         # print(corr)
         return corr
 
+    def english_bigram_correlation(self):
+        if len(self.ciphertext_bigram_frequencies.keys()) == 0: self.set_bigram_frequencies()
+        corr = 0
+        for bigram, freq in self.ciphertext_bigram_frequencies.items():
+            corr += (freq * FrequencyAnalysis.bigram_frequencies.get(bigram, 0))
+        return corr
+
     def frequency_autocorrelation(self):
         lf = self.letter_frequencies()
         corr = 0
@@ -137,48 +128,8 @@ class FrequencyAnalysis:
             corr += (freq ** 2)
         return corr
 
-    def max_correlation(self):
-        max_corr = float('-inf')
-        max_key = None
-        for key in range(26):
-            txt = self.decrypt_with_cc(key)
-            corr = FrequencyAnalysis(txt).english_correlation()
-            if(corr > max_corr):
-                max_corr = corr
-                max_key = key
-        return max_key, max_corr
-
-    def vc_freq_analysis_correlation(self):
-        columns = self.columnize()
-        return { col: FrequencyAnalysis("".join(chars)).max_correlation()[0] for col, chars in columns.items()}
-
-    def find_keylen(self, maxlen=20):
-        iocs = {}
-        for keylen in range(1, maxlen + 1):
-            columns = self.columnize(keylen)
-            col_iocs = [ FrequencyAnalysis("".join(chars)).index_of_coincidence() for col_no, chars in columns.items() ]
-            avg_col_ioc = sum(col_iocs) / len(col_iocs)
-            iocs[keylen] = avg_col_ioc
-        minval = float('inf')
-        minkey = None
-        for keylen, ioc in iocs.items(): 
-            abs_diff = abs(ioc - FrequencyAnalysis.english_ioc)
-            if abs_diff < minval: 
-                # Account for the fact that multiples of the actual keylen also has a good ioc score
-                if(minkey and abs(abs_diff - minval) < 0.1 and keylen % minkey == 0 and abs_diff < 0.1): break
-                minval = abs_diff
-                minkey = keylen
-        # print(f"IOCs: {iocs}")
-        # print(f"Min IOC is {iocs[minkey]} with a keylen {minkey}")
-        return minkey
-
-
-    def columnize(self, keylen=0):
-        if not keylen: keylen = self.keylen 
-        columns = {i: [] for i in range(keylen)}
-        for i, char in enumerate(self.ciphertext):
-            columns[i % keylen].append(char)
-        return columns
+    def ioc_deviation(self):
+        return abs(self.index_of_coincidence() - FrequencyAnalysis.english_ioc)
 
 
     def index_of_coincidence(self):
@@ -203,26 +154,6 @@ class FrequencyAnalysis:
         return { char: (count / self.total_chars) for (char, count) in sorted(self.letter_histogram.items(), key=lambda item: item[1], reverse=True) }
 
 
-    def decrypt_with_cc(self, key):
-        return FrequencyAnalysis.decrypt_cc(key, self.ciphertext)
-
-    def decrypt_with_vc(self, key):
-        return FrequencyAnalysis.decrypt_vc(key, self.ciphertext)
-
-    def bf_cc(self):
-        key, _ = self.max_correlation()
-        return key, self.decrypt_with_cc(key)
-
-    def crack_vigenere(self):
-        self.keylen = self.find_keylen()
-        key = self.vc_freq_analysis_correlation()
-        return key, self.decrypt_with_vc(key.values())
-
-
-    def is_cc(self):
-        corr = self.english_correlation() 
-        return corr >= 0.063 and corr <= 0.068
-
     def set_bigram_frequencies(self):
         bigrams = {}
         chars = [char for char in self.ciphertext]
@@ -242,21 +173,21 @@ class FrequencyAnalysis:
         lf = self.letter_frequencies()
         elf = FrequencyAnalysis.letters_ordered_by_frequency()
 
-        # letter_set = set(elf)
-        # for cipher_char, cipher_freq in lf.items():
-        #     closest_char = None
-        #     closest_distance = float('inf')
-        #     for english_char, english_freq in FrequencyAnalysis.english_letter_frequencies.items():
-        #         distance = abs(cipher_freq - english_freq)
-        #         if( distance < closest_distance and english_char in letter_set):
-        #             closest_char = english_char
-        #             closest_distance = distance
-        #     mapping[cipher_char] = closest_char
-        #     letter_set.remove(closest_char)
+        letter_set = set(elf)
+        for cipher_char, cipher_freq in lf.items():
+            closest_char = None
+            closest_distance = float('inf')
+            for english_char, english_freq in FrequencyAnalysis.english_letter_frequencies.items():
+                distance = abs(cipher_freq - english_freq)
+                if( distance < closest_distance and english_char in letter_set):
+                    closest_char = english_char
+                    closest_distance = distance
+            mapping[cipher_char] = closest_char
+            letter_set.remove(closest_char)
 
-        # cracked =  "".join([mapping.get(char, '*') for char in self.ciphertext])
-        # curr_soln_fa = FrequencyAnalysis(cracked)
-        # self.set_bigram_frequencies()
+        cracked =  "".join([mapping.get(char, '*') for char in self.ciphertext])
+        curr_soln_fa = FrequencyAnalysis(cracked)
+        self.set_bigram_frequencies()
 
         
 
@@ -289,7 +220,7 @@ class FrequencyAnalysis:
             new_cracked = "".join([new_mapping.get(char, '*') for char in self.ciphertext])
             new_soln_fa = FrequencyAnalysis(new_cracked)
             if(new_soln_fa.english_correlation() > curr_soln_fa.english_correlation()):
-                print("CHANGED!!!!!")
+                # print("CHANGED!!!!!")
                 curr_soln_fa = new_soln_fa
                 mapping = new_mapping
            
@@ -299,7 +230,10 @@ class FrequencyAnalysis:
         # mapping = {char: char for char in self.ciphertext}
         # cracked =  "".join([mapping.get(char, '*') for char in self.ciphertext])
         # curr_soln_fa = FrequencyAnalysis(cracked)
-        while(abs(curr_soln_fa.english_correlation() - 0.065) > 0.0002 ):
+        unigram_corr_range = 0.0007
+        bigram_corr_range = 0.0007
+        while(curr_soln_fa.english_correlation_distance() > unigram_corr_range or curr_soln_fa.bigram_correlation_distance() > bigram_corr_range):
+            
             new_mapping = dict(mapping)
             random_index_to_change = randint(0, len(new_mapping.keys()) - 1)
             random_cipherval_to_change = list(new_mapping.keys())[random_index_to_change]
@@ -307,18 +241,31 @@ class FrequencyAnalysis:
 
             prev_val = new_mapping[random_cipherval_to_change]
             new_val = elf[randint(0, len(elf) - 1)]
-
+            
+            #can delete vvv
+            subs = ''
 
             for cipherchar, plainchar in new_mapping.items():
                 if plainchar == new_val:
                     new_mapping[cipherchar] = prev_val
+                    subs = cipherchar
                     continue
             new_mapping[random_cipherval_to_change] = new_val
             new_cracked = "".join([new_mapping.get(char, '*') for char in self.ciphertext])
             new_soln_fa = FrequencyAnalysis(new_cracked)
-            if(new_soln_fa.english_correlation() > curr_soln_fa.english_correlation()):
+            better_unigram_corr = new_soln_fa.english_correlation_distance() < curr_soln_fa.english_correlation_distance()
+            better_bigram_corr = new_soln_fa.bigram_correlation_distance() < curr_soln_fa.bigram_correlation_distance()
+
+            if ( (better_unigram_corr or (new_soln_fa.english_correlation_distance() < unigram_corr_range )) and (better_bigram_corr or (new_soln_fa.bigram_correlation_distance() < bigram_corr_range))):
+                print(f"---\nswp\nOLD: {subs}: {new_val} and {random_cipherval_to_change}: {prev_val}\nNEW: {subs}: {prev_val} and {random_cipherval_to_change}: {new_val}\n---")
+                print(f"Unigram Correlation: {new_soln_fa.english_correlation()}")
+                print(f"Unigram Correlation Distance: {new_soln_fa.english_correlation_distance()}")
+                print(f"Bigram Correlation: {new_soln_fa.english_bigram_correlation()}")
+                print(f"Bigram Correlation Distance: {new_soln_fa.bigram_correlation_distance()}")
+                # print(f"Current Mapping: {new_mapping}")
                 curr_soln_fa = new_soln_fa
                 mapping = new_mapping
+            
 
 
         # print({char: FrequencyAnalysis.english_letter_frequencies[char] for char in FrequencyAnalysis.letters_ordered_by_frequency()})

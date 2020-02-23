@@ -1,6 +1,5 @@
 import re
 import math
-import code
 from random import randint
 
 class FrequencyAnalysis:

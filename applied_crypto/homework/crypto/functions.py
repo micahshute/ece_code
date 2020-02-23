@@ -78,5 +78,3 @@ def to_str(obj):
         return int2str(obj)
     else:
         raise ValueError('must be an int or string')
-
-

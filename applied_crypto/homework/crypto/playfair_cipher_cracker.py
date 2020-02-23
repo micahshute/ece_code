@@ -1,4 +1,4 @@
-from python_resources.decorator import *
+from crypto.analysis_decorator import *
 import random
 import math
 import code
@@ -179,17 +179,16 @@ class PlayfairCipherCracker(AnalysisDecorator):
                 ckey = tkey
                 cmsg = tmsg
                 no_change_count = 0
-                print('--------- KEY REFINEMENT PROCESS ---------')
-                
+
                 if self.fitness_score(cmsg) < self.fitness_score(bmsg):
                     bkey = ckey
                     bmsg = cmsg
-                
-                print(f"Best Key: {bkey}")
-                print(f"Best Key Score: {self.fitness_score(bmsg)}")
-                print(f"Local Key: {ckey}")
-                print(f"Local Key Score: {self.fitness_score(cmsg)}")
-                print('----------')
+                # print('--------- KEY REFINEMENT PROCESS ---------')
+                # print(f"Best Key: {bkey}")
+                # print(f"Best Key Score: {self.fitness_score(bmsg)}")
+                # print(f"Local Key: {ckey}")
+                # print(f"Local Key Score: {self.fitness_score(cmsg)}")
+                # print('----------')
             else:
                 no_change_count += 1
 
@@ -207,32 +206,23 @@ class PlayfairCipherCracker(AnalysisDecorator):
         bkey = self.copy_key(ckey)
 
         cmsg = self.new_analyzer(self.decipher(self.copy_key(ckey), self.analyzer.ciphertext))
-
-        curr_uni_div = cmsg.english_correlation_distance()
-        curr_big_div = cmsg.bigram_correlation_distance()
-        curr_tri_div = cmsg.trigram_correlation_distance()
         ctrilog = cmsg.trigram_log_score()
         best_msg = cmsg
-        best_uni_div = curr_uni_div
-        best_big_div = curr_big_div
-        best_tri_div = curr_tri_div
+
         max_iters = 200000
         reset_iters = 1000
         consecutive_no_change = 0
         count = 1
 
-
         while abs(ctrilog) > 2325:
 
             if(consecutive_no_change >= reset_iters):
-
                 test_key = self.random_key()
                 test_key = self.random_row_swap(self.transpose_key(ckey))
             else:
                 test_key = self.random_key_swap(ckey)
 
             test_msg = self.new_analyzer(self.decipher(self.copy_key(test_key), self.analyzer.ciphertext))
-
             print(f"X {count}/{max_iters} iterations", end="\r")
  
             if self.fitness_score(test_msg) < self.fitness_score(cmsg) or consecutive_no_change >= reset_iters:
@@ -245,14 +235,14 @@ class PlayfairCipherCracker(AnalysisDecorator):
                     bkey = list(ckey)
                     best_msg = self.new_analyzer(cmsg.ciphertext)
 
-                print('-------Key Aquisition Process-------')
-                print(f"Looking for a key with a score < 5165")
-                print(f"Best overall key:{bkey}")
-                print(f"Best key score: {self.fitness_score(best_msg)}")
-                print(f"Best local key {ckey}")
-                print(f"Local Key score: {self.fitness_score(cmsg)}")
-                print('-------')
-                print('-------')
+                # print('-------Key Aquisition Process-------')
+                # print(f"Looking for a key with a score < 5165")
+                # print(f"Best overall key:{bkey}")
+                # print(f"Best key score: {self.fitness_score(best_msg)}")
+                # print(f"Best local key {ckey}")
+                # print(f"Local Key score: {self.fitness_score(cmsg)}")
+                # print('-------')
+                # print('-------')
             else:
                 consecutive_no_change += 1
 

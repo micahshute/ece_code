@@ -15,6 +15,6 @@ def crand(seed):
         # yield next
         yield (next >> 1 if next < 2**32 else (next % 2**32) >> 1)
 
-my_generator = crand(123)
+my_generator = crand(1)
 for i in range(5):
     print(next(my_generator))

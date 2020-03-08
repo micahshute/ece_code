@@ -3,7 +3,7 @@
 
 int main(void) {
 
-    unsigned int seed = 123;
+    unsigned int seed = 1;
     srand(seed);
 
     int i=0;

@@ -1,5 +1,54 @@
-from python_resources.functions import *
-import code
+import sage.all as sage
+from random import *
+# NOTE I'm putting all the code in 1 file 
+# for submission even though I had previously
+# broken it up in multiple files
+
+# TO RUN: (on mac) run: brew cask install sage
+# run the file with sage -python3 crack_crand
+
+
+def crand(seed):
+    r=[]
+    r.append(seed)
+    for i in range(30):
+        r.append((16807*r[-1]) % 2147483647)
+        if r[-1] < 0:
+            r[-1] += 2147483647
+    for i in range(31, 34):
+        r.append(r[len(r)-31])
+    for i in range(34, 344):
+        r.append((r[len(r)-31] + r[len(r)-3]) % 2**32)
+    while True:
+        next = r[len(r)-31]+r[len(r)-3] % 2**32
+        r.append(next)
+        yield (next >> 1 if next < 2**32 else (next % 2**32) >> 1)
+
+def to_bin_arr(num, length=None):
+    bnum = bin(num)[2:]
+    if length is not None:
+        bnum = ('0' * (length - len(bnum))) + bnum
+    return [int(i) for i in bnum]
+
+def inv_mod(a,b):
+    r, rm1 = b, a
+    s, sm1 = 0, 1
+    t, tm1 = 1, 0
+    while r != 0:
+        q = rm1 // r
+        rm1, r = r, rm1 % r
+        sm1, s = s, sm1 - q * s
+        tm1, t = t, tm1 - q * t
+    d = sm1 * a + tm1 * b
+    return d, sm1, tm1
+
+def smod_mat(vals, mod):
+    r = sage.IntegerModRing(mod)
+    return sage.matrix(r, vals)
+
+def sinv_mat(mat):
+    return mat.inverse()
+
 
 class RandBreaker:
 
@@ -128,10 +177,8 @@ class RandBreaker:
                     rrems[i-31] = 0
         updating = True
         count = 0
-        changes = 0
 
         while updating:
-            # print(f"updating count: {count}")
             updating = False
             for i in range(31, len(rrems)):
                 if rrems[i] == 1:
@@ -210,22 +257,14 @@ class RandBreaker:
         return self.lincombos[term]
 
     def crack(self):
-        st = 31
+        st = self.startbit
         # st = 10030
-        totseen = set()
         while True:
-            
             eqns = [self.get_lincomb_for_term(i + 344) for i in range(st, st + 31)]
-            
             coeff_lists = [list(eqn.to_coeff_list()) for eqn in eqns]
-            
-            
             mcl = smod_mat(coeff_lists, 2 ** 32)
             mclinv = sinv_mat(mcl)
-            # print(mclinv)
-            # seed_coeffs = mclinv.tolist()[0] 
             seed_coeffs = mclinv[0] 
-            
             seen = set()
             for rip375s in self.all_rip375s:
                 seed = 0
@@ -236,14 +275,9 @@ class RandBreaker:
                 testvals = RandBreaker.get_random_vals(int(seedmod), st, st + 31)
                 if testvals == self.bitstream[self.startbit: self.startbit + 31]:
                     return seedmod, st
-                # if abs(seedmod - 888888) < 100: print(seedmod)
-                # if abs(seedmod - 888888) < 100000: print(seedmod)
-                # if seedmod in totseen: print("\nSEEN")
-                # print(len(totseen))
                 print(f"Check for bitnum {st}, seedmod {seedmod}", end="\r")
                 seen.add(seedmod)
-                
-                totseen.add(seedmod)
+
             st += 1
 
     class Equation:
@@ -267,8 +301,42 @@ class RandBreaker:
         def to_coeff_list(self):
             coarr = [0 for _ in range(31)]
             for term, coeff in self.coeffs.items():
-                #NOTE: ADDED MOD BELOW
-                coarr[term] = coeff #% 2 ** 32
+                coarr[term] = coeff 
             return coarr
 
-            
+
+
+
+theseed = randint(1, 2**30)
+skip = randint(10000, 200000)
+print(f"Should break somewhere between {skip} and {skip + 93} iterations")
+
+my_generator = crand(theseed)
+for i in range(skip):
+    temp = next(my_generator)
+
+the_input = [next(my_generator) for i in range(93)]
+
+the_output = [next(my_generator) for i in range(93)]
+
+
+def your_code(theinput):
+    rb = RandBreaker(theinput)
+    # rb = RandBreaker.create_test()
+    res = rb.crack()
+    print()
+    print(res)
+    seed, ip31term = res
+    starting_term = ip31term + 93 - rb.startbit
+    cgen = crand(int(seed))
+    out = []
+    for i in range(starting_term):
+        next(cgen)
+    for i in range(93):
+        out.append(next(cgen))
+    return out
+
+if your_code(the_input) == the_output:
+    print("You win")
+else:
+    print("Try again")

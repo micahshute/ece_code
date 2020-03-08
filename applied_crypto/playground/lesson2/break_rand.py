@@ -19,8 +19,9 @@ def crand(seed):
 
 theseed = randint(1, 2**30)
 skip = randint(10000, 200000)
-skip = 26
-print(skip)
+
+print(f"Should break somewhere between {skip} and {skip + 93} iterations")
+
 my_generator = crand(theseed)
 for i in range(skip):
     temp = next(my_generator)
@@ -37,7 +38,7 @@ def your_code(theinput):
     print()
     print(res)
     seed, ip31term = res
-    starting_term = ip31term + 62
+    starting_term = ip31term + 93 - rb.startbit
     cgen = crand(int(seed))
     out = []
     for i in range(starting_term):

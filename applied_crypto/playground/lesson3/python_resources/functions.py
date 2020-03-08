@@ -1,5 +1,6 @@
 import math
 import binascii
+import hashlib
 
 def crand(seed):
     r=[]
@@ -52,3 +53,11 @@ def hex2str(hx):
 
 def digest_to_hex(dig):
     return binascii.unhexlify(dig)
+
+def nonce_key(nonce, key):
+    hexnonce = nonce.hex()
+    keyhex = format(key, 'x')
+    concathex = hexnonce + keyhex
+    even_len = concathex.rjust(len(concathex) + len(concathex) % 2, '0')
+    hexhash = hashlib.sha256(bytes.fromhex(even_len)).hexdigest()
+    return int(hexhash, 16) % 2**32

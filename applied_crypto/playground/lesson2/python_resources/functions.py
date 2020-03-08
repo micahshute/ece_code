@@ -32,6 +32,9 @@ def sinv_mat(mat):
 def matrix(vals):
     return sp.Matrix(vals)
 
+def valid_index(index, arr):
+    return index >= 0 and index < len(arr)
+
 # def inv_mod_matrix(matrix, mod):
 #         det = matrix.det()
 #         _, modinv, _= inv_mod(det, mod)

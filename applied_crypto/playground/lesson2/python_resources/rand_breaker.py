@@ -136,6 +136,8 @@ class RandBreaker:
         # st = 31
         st = 10030
         st = 24000
+        st = 5
+        # totseen = set()
         while True:
             
             eqns = [self.get_lincomb_for_term(i + 344) for i in range(st, st + 31)]
@@ -161,8 +163,11 @@ class RandBreaker:
                     return seedmod, st
                 # if abs(seedmod - 888888) < 100: print(seedmod)
                 # if abs(seedmod - 888888) < 100000: print(seedmod)
+                # if seedmod in totseen: print("\nHEREEEEEE")
                 print(f"Check for bitnum {st}, seedmod {seedmod}", end="\r")
                 seen.add(seedmod)
+                
+                totseen.add(seedmod)
             st += 1
 
     class Equation:

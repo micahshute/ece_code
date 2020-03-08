@@ -1,7 +1,7 @@
 import ssl
 from urllib.request import urlopen
 from python_resources.frequency_analysis import *
-
+from python_resources.vigenere_cipher_cracker import *
 
 res = urlopen("https://vip.udel.edu/crypto/mobydick.txt", context=ssl._create_unverified_context())
 txt = res.read().decode()
@@ -17,15 +17,21 @@ enres = urlopen("https://vip.udel.edu/crypto/encrypted_mobydick.txt",  context=s
 entxt = enres.read().decode()
 
 enfa = FrequencyAnalysis(entxt)
+vcracker = VigenereCipherCracker(enfa)
+
 
 print(f"Autocorelation of freqs: {enfa.frequency_autocorrelation()}")
 print(f"English correlation: {enfa.english_correlation()}")
 # print(f"Freq chart: {enfa.letter_frequencies()}")
 
-keylen = enfa.find_keylen(20)
-enfa.keylen = keylen
-keys = enfa.vc_freq_analysis_correlation()
-print(keys.values())
-out = enfa.decrypt_with_vc(keys.values())
+# keylen = enfa.find_keylen(20)
+# enfa.keylen = keylen
+# keys = enfa.vc_freq_analysis_correlation()
+# print(keys.values())
+# out = enfa.decrypt_with_vc(keys.values())
 # print(out)
+
+key, txt = vcracker.crack()
+
+print(key)
 

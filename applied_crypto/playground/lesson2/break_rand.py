@@ -19,7 +19,7 @@ def crand(seed):
 
 theseed = randint(1, 2**30)
 skip = randint(10000, 200000)
-skip = 23971
+skip = 26
 print(skip)
 my_generator = crand(theseed)
 for i in range(skip):

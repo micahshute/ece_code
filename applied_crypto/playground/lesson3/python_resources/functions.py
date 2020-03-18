@@ -19,7 +19,7 @@ def crand(seed):
         yield (next >> 1 if next < 2**32 else (next % 2**32) >> 1)
 
 def retreive_hbytes(num, bytecount):
-    hnum = format(num, 'x')
+    if type(num) == int: hnum = format(num, 'x')
     nums = [hnum[((i+1) * -2) + len(hnum): (i * -2) + len(hnum) ] for i in range(bytecount)]
     return nums
 
@@ -44,20 +44,32 @@ def stream_cipher(gen, msg, *, decode):
     if decode:
         hmsg = int(msg, 16)
     else:
-        hmsg = int(binascii.hexlify(msg.encode()), 16)
+        hmsg = int(msg.encode().hex(), 16)
     hbytes = int("".join(hbytes_list), 16)
     return format(hmsg ^ hbytes, 'x')
 
 def hex2str(hx):
-    return bytearray.fromhex(hx).decode()
+    return bytes.fromhex(hx).decode()
 
 def digest_to_hex(dig):
     return binascii.unhexlify(dig)
 
 def nonce_key(nonce, key):
+    if type(nonce) == str: nonce = bytes.fromhex(nonce)
     hexnonce = nonce.hex()
     keyhex = format(key, 'x')
     concathex = hexnonce + keyhex
     even_len = concathex.rjust(len(concathex) + len(concathex) % 2, '0')
     hexhash = hashlib.sha256(bytes.fromhex(even_len)).hexdigest()
     return int(hexhash, 16) % 2**32
+
+def npinv_mod_matrix(matrix, mod):
+        matrix = matrix_mod(matrix, mod)
+        det = int(round(np.linalg.det(matrix))) 
+        _, modinv, _= inv_mod(det, mod) 
+        modinv = int(modinv)
+        return matrix_round((modinv * det * np.linalg.inv(matrix)))
+
+
+def npmatrix(nums):
+    return np.matrix(nums, dtype=np.int64)

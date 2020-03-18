@@ -91,8 +91,6 @@ class RandBreaker:
         while True:
             next = r[len(r)-31]+r[len(r)-3] % 2**32
             r.append(next)
-            ## if counter >= 31 + 16 and counter < 62 + 16: print(next - 2 * (next // 2) )
-            # if counter >= 31 and counter < 62: print(next >> 1 if next < 2**32 else (next % 2**32) >> 1) 
             counter += 1
             yield ((next >> 1 if next < 2**32 else (next % 2**32) >> 1), next - 2 * (next // 2))
 
@@ -123,21 +121,16 @@ class RandBreaker:
         for xi in testrb.possible_xis:
             if xi == xis[31:62]: 
                 print(True)
-            # NOTE: NEED TO MAX XI LENGTH EQUAL XIS LEN. CURRENNTLY LEN XI IS 31, XI IS 93
-                
-        print('Done search')
         return testrb
 
     def __init__(self, bitstream):
         self.startbit = None
         self.bitstream = bitstream
         self.known_xis = self.get_xis()
-        ## print(self.known_xis)
         self.possible_xis = self.xi_permutations()
         self.all_rip375s = []
         for xis in self.possible_xis:
             self.all_rip375s.append([(self.bitstream[i + self.startbit] * 2 + xis[i]) % 2 ** 32 for i in range(31)])
-        # print(self.rip375s) # starting output number = i + 31, rnum = i + 375
         self.lincombos = {}
 
 
@@ -163,7 +156,6 @@ class RandBreaker:
     def get_xis(self):
         rrems = [None for _ in range(len(self.bitstream))]
         res = [(self.bitstream[i] - self.bitstream[i - 3] - self.bitstream[i - 31]) % 2 ** 31  for i in range(31, len(self.bitstream))]
-        # return [0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1]
         for i in range(31, len(self.bitstream)):
             if res[i - 31] == 1:
                 rrems[i - 31] = 1

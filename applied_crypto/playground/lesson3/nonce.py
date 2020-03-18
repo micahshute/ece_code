@@ -1,4 +1,5 @@
 import os, hashlib, binascii
+from python_resources.functions import nonce_key
 nonce = os.urandom(6)
 print(nonce)
 # hexnonce = binascii.hexlify(nonce)
@@ -18,9 +19,6 @@ hexhash = hashlib.sha256(bytes.fromhex(even_length)).hexdigest()
 print(hexhash)
 
 newseed = (int(hexhash, 16)) % 2**32
-
-
-
-
-
 print(newseed)
+print(nonce_key(nonce, oursecret))
+

@@ -61,16 +61,23 @@ class ImageEncrypter:
         Image.frombytes(mode, size, e_img_bytes).save(self.writepath)
 
 
-imgpath = "mill_falc.png"
+# imgpath = "mill_falc.png"
 
-ie = ImageEncrypter(imgpath, key='secret', aes_mode=AES.MODE_CBC)
+# ie = ImageEncrypter(imgpath, key='secret', aes_mode=AES.MODE_CBC)
 
-ie.encrypt()
-decrypt_iv = ie.iv
-ie.path = ie.writepath
-ie.writepath = "orig_pic.png"
-ie.decrypt()
+# ie.encrypt()
+# decrypt_iv = ie.iv
+# ie.path = ie.writepath
+# ie.writepath = "orig_pic.png"
+# ie.decrypt()
 
-# CODE BELOW decrypts a pic if you know the IV (not stored in the object)
-ie = ImageEncrypter('output_pic.png', key='secret', writepath="test.png", aes_mode=AES.MODE_CBC, iv=decrypt_iv)
+# # CODE BELOW decrypts a pic if you know the IV (not stored in the object)
+# ie = ImageEncrypter('output_pic.png', key='secret', writepath="test.png", aes_mode=AES.MODE_CBC, iv=decrypt_iv)
+# ie.decrypt()
+
+imgpath = "classmate_pic_cfb.png"
+key= b'\x10\x075\x9f\xb6\xa4\xe1P\x9c\xee\xd87\x0eI\x19&'.hex()
+iv=  b'\xd9S\xce1\xc4\xfd\x157\xe2Z\xcd(\x885|%'
+
+ie = ImageEncrypter(imgpath, iv=iv, key=key, key_hashed=False, aes_mode=AES.MODE_CFB)
 ie.decrypt()

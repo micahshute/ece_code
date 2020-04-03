@@ -2,7 +2,7 @@ require 'pry'
 require_relative './ruby_resources/historic_ciphers'
 
 
-phrase = "hvwgw gqozz srobv wghcf wqozq wdvsf psqoi gswhw gpfcy sbhbl"
+phrase = "VTMTEHZ EBYM TKFR YXTMNKX"
 bf_result = HistoricCiphers::CaesarCipher.brute_force_decrypt(phrase)
 
 # puts bf_result

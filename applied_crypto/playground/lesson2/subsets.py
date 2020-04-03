@@ -16,7 +16,7 @@ def gen_subsets(s, mod=None):
         print(f"---\nNum: {num}\nSet: {cset}\n-----")
     return subsets 
 
-s = gen_mult_group(31)
+s = gen_mult_group(47)
 ss = gen_subsets(s)
 print(ss)
 print([len(ms) for ms in ss])

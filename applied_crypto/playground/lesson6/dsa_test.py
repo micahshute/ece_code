@@ -51,4 +51,20 @@ g_kemod = pow(gint, ke, pint) % qint
 
 print(g_kemod)
 print(rint)
-print(sint)
+print(g_kemod == rint)
+
+w = inv_mod(sint, qint) % qint
+u1 = (w * z) % qint
+u2 = (w * rint) % qint
+# bu2 = pow(pubint, u2, pint)
+# gu1 = pow(gint, u1, pint)
+# v = (gu1 * bu2 % pint) % qint
+v = (pow(gint, u1, pint) * pow(pubint, u2, pint) % pint) % qint
+# print('----')
+# print(pow(gint, ke, pint))
+# print(gu1 * bu2 % pint)
+print('---')
+print(v)
+print(rint)
+print(v == rint)
+
